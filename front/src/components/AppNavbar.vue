@@ -1,7 +1,7 @@
 <template>
   <nav>
     <router-link to="/">Home</router-link>
-    <router-link to="/Applogin">Login</router-link>
+    <router-link to="/">Login</router-link>
     <router-link to="/Appregister">Cadastrar</router-link>
   </nav>
 </template>

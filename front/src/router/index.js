@@ -13,7 +13,7 @@ export default new Router({
       component: AppLogin
     },
     {
-      path: '/register',
+      path: '/Appregister',
       name: 'AppRegister',
       component: AppRegister
     }
