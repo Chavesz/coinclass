@@ -1,8 +1,15 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link>
-    <router-link to="/">Login</router-link>
-    <router-link to="/Appregister">Cadastrar</router-link>
+  <ul>
+      <li><router-link to="/">Home</router-link></li>
+      <li><router-link to="/">Login</router-link></li>
+      <li><router-link to="/Appregister">Cadastrar</router-link></li>
+      <li><router-link to="/Appdashboard">Dashboard</router-link></li>
+      <li><router-link to="/Apptransactions">Transações</router-link></li>
+      <li><router-link to="/Appcategories">Categorias</router-link></li>
+      <li><router-link to="/Appreports">Relatórios</router-link></li>
+      <li><router-link to="/Appsettings">Configurações</router-link></li>
+    </ul>
   </nav>
 </template>
 

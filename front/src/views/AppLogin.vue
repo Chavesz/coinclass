@@ -15,7 +15,7 @@
 
         <button type="submit" class="login-btn">Entrar</button>
       </form>
-      <p class="signup-link">Ainda não tem uma conta? <router-link to="/register">Cadastre-se</router-link></p>
+      <p class="signup-link">Ainda não tem uma conta? <router-link to="/Appregister">Cadastre-se</router-link></p>
     </div>
   </div>
 </template>
