@@ -1,33 +1,24 @@
 <template>
-  <nav>
-  <ul>
-      <li><router-link to="/">Home</router-link></li>
-      <li><router-link to="/">Login</router-link></li>
-      <li><router-link to="/Appregister">Cadastrar</router-link></li>
-      <li><router-link to="/Appdashboard">Dashboard</router-link></li>
-      <li><router-link to="/Apptransactions">Transações</router-link></li>
-      <li><router-link to="/Appcategories">Categorias</router-link></li>
-      <li><router-link to="/Appreports">Relatórios</router-link></li>
-      <li><router-link to="/Appsettings">Configurações</router-link></li>
-    </ul>
-  </nav>
+  <header class="navbar">
+    <h2>CoinClass</h2>
+  </header>
 </template>
 
 <script>
 export default {
-  name: 'AppNavbar'
-}
+  name: "AppNavbar"
+};
 </script>
 
 <style scoped>
-nav {
-  display: flex;
-  gap: 20px;
+.navbar {
+  width: 100%;
   background-color: #333;
-  padding: 10px;
-}
-router-link {
   color: white;
-  text-decoration: none;
+  padding: 15px;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 </style>

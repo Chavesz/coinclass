@@ -1,20 +1,29 @@
 <template>
   <div id="app">
-    <AppNavbar />
-    <router-view />  <!-- Aqui as páginas são renderizadas -->
+    <AppSidebar />
+    <div class="content">
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
-import AppNavbar from './components/AppNavbar.vue'
+import AppSidebar from "@/components/AppSidebar.vue";
 
 export default {
-  components: {
-    AppNavbar
-  }
-}
+  components: { AppSidebar }
+};
 </script>
 
 <style>
-/* Adicione seu estilo global aqui */
+/* Ajustando layout para a sidebar */
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-collapsed + .content {
+  margin-left: 70px;
+}
 </style>
