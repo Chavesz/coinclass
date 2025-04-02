@@ -16,13 +16,13 @@
       </button>
       
       <ul class="nav-list">
-        <li><router-link to="/">🏠 Home</router-link></li>
-        <li><router-link to="/Appregister">📝 Cadastrar</router-link></li>
-        <li><router-link to="/Appdashboard">📊 Dashboard</router-link></li>
-        <li><router-link to="/Apptransactions">💰 Transações</router-link></li>
-        <li><router-link to="/Appcategories">📂 Categorias</router-link></li>
-        <li><router-link to="/Appreports">📈 Relatórios</router-link></li>
-        <li><router-link to="/Appsettings">⚙️ Configurações</router-link></li>
+        <li><router-link to="/" class="nav-button">🏠 Home</router-link></li>
+        <li><router-link to="/Appregister" class="nav-button">📝 Cadastrar</router-link></li>
+        <li><router-link to="/Appdashboard" class="nav-button">📊 Dashboard</router-link></li>
+        <li><router-link to="/Apptransactions" class="nav-button">💰 Transações</router-link></li>
+        <li><router-link to="/Appcategories" class="nav-button">📂 Categorias</router-link></li>
+        <li><router-link to="/Appreports" class="nav-button">📈 Relatórios</router-link></li>
+        <li><router-link to="/Appsettings" class="nav-button">⚙️ Configurações</router-link></li>
       </ul>
     </nav>
   </div>
@@ -130,25 +130,32 @@ h1 {
   padding: 0;
   width: 100%;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 li {
   width: 100%;
 }
 
-router-link {
+.nav-button {
   display: block;
-  width: 100%;
-  padding: 14px 20px;
+  width: 90%;
+  padding: 12px;
+  margin: 0 auto;
   text-decoration: none;
   color: white;
-  transition: background 0.3s, padding-left 0.3s;
+  background: #333;
+  text-align: center;
   font-size: 18px;
+  border-radius: 8px;
+  transition: background 0.3s, transform 0.2s;
 }
 
-router-link:hover {
+.nav-button:hover {
   background: #ff9800;
   color: black;
-  padding-left: 25px;
+  transform: scale(1.05);
 }
 </style>

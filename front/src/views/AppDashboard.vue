@@ -103,7 +103,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 100px;
   background-color: #f4f4f4;
   min-height: 100vh;
 }
@@ -151,7 +151,7 @@ h1 {
 .transactions-table {
   background: white;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
