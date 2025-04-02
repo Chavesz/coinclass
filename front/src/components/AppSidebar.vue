@@ -1,12 +1,21 @@
 <template>
-  <div>
+  <div class="layout">
+    <!-- Cabeçalho fixo -->
+    <header class="header">
+      <div class="logo-container">
+        <img src="/coinclass.png" alt="CoinClass Logo" class="logo-img">
+        <h1>CoinClass</h1>
+      </div>
+    </header>
+    
+    <!-- Barra lateral -->
     <nav :class="['sidebar', { 'sidebar-collapsed': isCollapsed }]">
       <button class="toggle-btn" @click="toggleSidebar">
         <span v-if="isCollapsed">☰</span>
         <span v-else>✖</span>
       </button>
       
-      <ul>
+      <ul class="nav-list">
         <li><router-link to="/">🏠 Home</router-link></li>
         <li><router-link to="/Appregister">📝 Cadastrar</router-link></li>
         <li><router-link to="/Appdashboard">📊 Dashboard</router-link></li>
@@ -36,6 +45,46 @@ export default {
 </script>
 
 <style scoped>
+/* Layout principal */
+.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho */
+.header {
+  width: 100%;
+  height: 60px;
+  background-color: #1a1a1a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff9800;
+}
+
 /* Sidebar */
 .sidebar {
   width: 260px;
@@ -43,18 +92,19 @@ export default {
   background-color: #1a1a1a;
   color: white;
   position: fixed;
-  top: 0;
+  top: 60px;
   left: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 20px;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease-in-out;
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 999;
 }
 
 .sidebar-collapsed {
-  width: 100px;
+  width: 95px;
 }
 
 /* Botão recolher/expandir */
@@ -67,50 +117,38 @@ export default {
   padding: 10px;
   border-radius: 50%;
   transition: background 0.3s ease;
+  margin-bottom: 20px;
 }
 
 .toggle-btn:hover {
   background: #e68900;
 }
 
-/* Logo */
-.logo {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.logo-img {
-  width: 140px;
-  height: auto;
-}
-
 /* Links de navegação */
-ul {
+.nav-list {
   list-style: none;
   padding: 0;
   width: 100%;
+  text-align: left;
 }
 
 li {
   width: 100%;
-  margin: 10px 0;
 }
 
 router-link {
   display: block;
   width: 100%;
-  padding: 14px;
+  padding: 14px 20px;
   text-decoration: none;
   color: white;
-  transition: background 0.3s;
-  white-space: nowrap;
+  transition: background 0.3s, padding-left 0.3s;
   font-size: 18px;
 }
 
 router-link:hover {
   background: #ff9800;
   color: black;
-  padding-left: 20px;
-  transition: 0.3s;
+  padding-left: 25px;
 }
 </style>
