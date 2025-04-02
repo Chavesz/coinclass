@@ -2,13 +2,10 @@
   <div>
     <nav :class="['sidebar', { 'sidebar-collapsed': isCollapsed }]">
       <button class="toggle-btn" @click="toggleSidebar">
-        {{ isCollapsed ? '➡️' : '⬅️' }}
+        <span v-if="isCollapsed">☰</span>
+        <span v-else>✖</span>
       </button>
       
-      <div v-if="!isCollapsed" class="logo">
-        <img src="/coinclass.png" alt="CoinClass Logo" class="logo-img">
-      </div>
-
       <ul>
         <li><router-link to="/">🏠 Home</router-link></li>
         <li><router-link to="/Appregister">📝 Cadastrar</router-link></li>
@@ -41,9 +38,9 @@ export default {
 <style scoped>
 /* Sidebar */
 .sidebar {
-  width: 250px;
+  width: 260px;
   height: 100vh;
-  background-color: #333;
+  background-color: #1a1a1a;
   color: white;
   position: fixed;
   top: 0;
@@ -53,26 +50,27 @@ export default {
   align-items: center;
   padding-top: 20px;
   transition: width 0.3s ease;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Sidebar recolhida */
 .sidebar-collapsed {
-  width: 70px;
+  width: 100px;
 }
 
 /* Botão recolher/expandir */
 .toggle-btn {
-  background: none;
+  background: #ff9800;
   border: none;
   color: white;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
-  margin-bottom: 10px;
-  transition: transform 0.3s ease;
+  padding: 10px;
+  border-radius: 50%;
+  transition: background 0.3s ease;
 }
 
-.sidebar-collapsed .toggle-btn {
-  transform: rotate(180deg);
+.toggle-btn:hover {
+  background: #e68900;
 }
 
 /* Logo */
@@ -82,7 +80,7 @@ export default {
 }
 
 .logo-img {
-  width: 120px;
+  width: 140px;
   height: auto;
 }
 
@@ -101,16 +99,18 @@ li {
 router-link {
   display: block;
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   text-decoration: none;
   color: white;
   transition: background 0.3s;
   white-space: nowrap;
+  font-size: 18px;
 }
 
 router-link:hover {
-  background: #444;
-  border-left: 4px solid #5c6bc0;
-  padding-left: 16px;
+  background: #ff9800;
+  color: black;
+  padding-left: 20px;
+  transition: 0.3s;
 }
 </style>
