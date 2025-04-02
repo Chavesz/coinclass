@@ -7,13 +7,19 @@ import AppCategories from '@/views/AppCategories.vue'
 import AppReports from '@/views/AppReports.vue'
 import AppSettings from '@/views/AppSettings.vue'
 import AppTransactions from '@/views/AppTransactions.vue'
+import AppOverview from '@/views/AppOverview.vue'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: "/",
+      name: "Overview",
+      component: AppOverview
+    },
+    {
+      path: '/Applogin',
       name: 'AppLogin',
       component: AppLogin
     },

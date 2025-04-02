@@ -1,46 +1,25 @@
 <template>
   <div class="layout">
-    <!-- Cabeçalho fixo -->
+    <!-- Cabeçalho fixo com navegação -->
     <header class="header">
       <div class="logo-container">
         <img src="/coinclass.png" alt="CoinClass Logo" class="logo-img">
         <h1>CoinClass</h1>
       </div>
+      <nav class="nav-menu">
+        <router-link to="/">🏠 Visão Geral</router-link>
+        <router-link to="/Appdashboard">📊 Dashboard</router-link>
+        <router-link to="/AppCategories">🏷️ Categorias</router-link>
+        <router-link to="/Apptransactions">💰 Transações</router-link>
+        <router-link to="/Appsettings">⚙️ Configurações</router-link>
+      </nav>
     </header>
-    
-    <!-- Barra lateral -->
-    <nav :class="['sidebar', { 'sidebar-collapsed': isCollapsed }]">
-      <button class="toggle-btn" @click="toggleSidebar">
-        <span v-if="isCollapsed">☰</span>
-        <span v-else>✖</span>
-      </button>
-      
-      <ul class="nav-list">
-        <li><router-link to="/" class="nav-button">🏠 Home</router-link></li>
-        <li><router-link to="/Appregister" class="nav-button">📝 Cadastrar</router-link></li>
-        <li><router-link to="/Appdashboard" class="nav-button">📊 Dashboard</router-link></li>
-        <li><router-link to="/Apptransactions" class="nav-button">💰 Transações</router-link></li>
-        <li><router-link to="/Appcategories" class="nav-button">📂 Categorias</router-link></li>
-        <li><router-link to="/Appreports" class="nav-button">📈 Relatórios</router-link></li>
-        <li><router-link to="/Appsettings" class="nav-button">⚙️ Configurações</router-link></li>
-      </ul>
-    </nav>
   </div>
 </template>
 
 <script>
 export default {
-  name: "AppSidebar",
-  data() {
-    return {
-      isCollapsed: false
-    };
-  },
-  methods: {
-    toggleSidebar() {
-      this.isCollapsed = !this.isCollapsed;
-    }
-  }
+  name: "AppHeader",
 };
 </script>
 
@@ -85,77 +64,23 @@ h1 {
   color: #ff9800;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 260px;
-  height: 100vh;
-  background-color: #1a1a1a;
-  color: white;
-  position: fixed;
-  top: 60px;
-  left: 0;
+/* Menu de navegação */
+.nav-menu {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 20px;
-  transition: width 0.3s ease-in-out;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
-  z-index: 999;
+  gap: 20px;
 }
 
-.sidebar-collapsed {
-  width: 95px;
-}
-
-/* Botão recolher/expandir */
-.toggle-btn {
-  background: #ff9800;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 50%;
-  transition: background 0.3s ease;
-  margin-bottom: 20px;
-}
-
-.toggle-btn:hover {
-  background: #e68900;
-}
-
-/* Links de navegação */
-.nav-list {
-  list-style: none;
-  padding: 0;
-  width: 100%;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-li {
-  width: 100%;
-}
-
-.nav-button {
-  display: block;
-  width: 90%;
-  padding: 12px;
-  margin: 0 auto;
+.nav-menu a {
   text-decoration: none;
   color: white;
-  background: #333;
-  text-align: center;
-  font-size: 18px;
-  border-radius: 8px;
-  transition: background 0.3s, transform 0.2s;
+  font-size: 16px;
+  padding: 10px;
+  transition: background 0.3s, color 0.3s;
+  border-radius: 4px;
 }
 
-.nav-button:hover {
+.nav-menu a:hover {
   background: #ff9800;
   color: black;
-  transform: scale(1.05);
 }
 </style>

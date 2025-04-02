@@ -1,49 +1,37 @@
 <template>
-  <header class="navbar">
-    <div class="navbar-container">
-      <!-- Logo -->
+  <div class="layout">
+    <!-- Cabeçalho fixo com navegação -->
+    <header class="header">
       <div class="logo-container">
         <img src="/coinclass.png" alt="CoinClass Logo" class="logo-img">
         <h1>CoinClass</h1>
       </div>
-
-      <!-- Menu de navegação -->
-      <nav class="nav-links">
-        <ul>
-          <li><router-link to="/">🏠 Home</router-link></li>
-          <li><router-link to="/Appdashboard">📊 Dashboard</router-link></li>
-          <li><router-link to="/Apptransactions">💰 Transações</router-link></li>
-          <li><router-link to="/Appsettings">⚙️ Configurações</router-link></li>
-        </ul>
+      <nav class="nav-menu">
+      <router-link to="/">🏠 Visão Geral</router-link>
+      <router-link to="/Appdashboard">📊 Dashboard</router-link>
+      <router-link to="/AppCategories">🏷️ Categorias</router-link>
+      <router-link to="/Apptransactions">💰 Transações</router-link>
+      <router-link to="/Appsettings">⚙️ Configurações</router-link>
       </nav>
-
-      <!-- Botão de menu para mobile -->
-      <button class="menu-btn" @click="toggleMenu">
-        ☰
-      </button>
-    </div>
-  </header>
+    </header>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "AppNavbar",
-  data() {
-    return {
-      menuOpen: false
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.menuOpen = !this.menuOpen;
-    }
-  }
+  name: "AppHeader",
 };
 </script>
 
 <style scoped>
-/* Estilização do Navbar */
-.navbar {
+/* Layout principal */
+.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho */
+.header {
   width: 100%;
   height: 60px;
   background-color: #1a1a1a;
@@ -59,15 +47,6 @@ export default {
   z-index: 1000;
 }
 
-/* Container do Navbar */
-.navbar-container {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Logo */
 .logo-container {
   display: flex;
   align-items: center;
@@ -80,52 +59,29 @@ export default {
 }
 
 h1 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: bold;
   color: #ff9800;
 }
 
 /* Menu de navegação */
-.nav-links ul {
-  list-style: none;
+.nav-menu {
   display: flex;
   gap: 20px;
 }
 
-.nav-links li {
-  display: inline;
-}
-
-.nav-links a {
+.nav-menu a {
   text-decoration: none;
   color: white;
   font-size: 16px;
-  transition: color 0.3s;
+  padding: 10px;
+  transition: background 0.3s, color 0.3s;
+  border-radius: 4px;
 }
 
-.nav-links a:hover {
-  color: #ff9800;
-}
-
-/* Botão do menu mobile */
-.menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-/* Responsivo para mobile */
-@media (max-width: 768px) {
-  .nav-links ul {
-    display: none;
-  }
-
-  .menu-btn {
-    display: block;
-  }
+.nav-menu a:hover {
+  background: #ff9800;
+  color: black;
 }
 </style>
 
