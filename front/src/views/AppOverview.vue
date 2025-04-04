@@ -23,7 +23,7 @@
     <!-- Gráfico -->
     <div class="card mb-8 dark:bg-gray-800 text-center">
       <h3 class="text-lg font-semibold mb-4">Resumo Gráfico</h3>
-      <canvas ref="chartCanvas" class="w-40 h-40 sm:w-[180px] sm:h-[180px] mx-auto"></canvas>
+      <canvas ref="chartCanvas" class="w-60 h-60 sm:w-[180px] sm:h-[180px] mx-auto"></canvas>
     </div>
 
     <!-- Contas e Saldo -->

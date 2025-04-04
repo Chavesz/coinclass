@@ -113,6 +113,7 @@ export default {
 .dashboard-content {
   width: 100%;
   max-width: 1200px;
+  padding: 1.5rem;
 }
 
 /* Cards responsivos */
@@ -139,15 +140,15 @@ export default {
 }
 
 .income {
-  background-color: #4CAF50;
+  background-color:rgb(144, 243, 105);
 }
 
 .expense {
-  background-color: #E53935;
+  background-color:rgb(240, 106, 106);
 }
 
 .balance {
-  background-color: #1E88E5;
+  background-color:rgb(177, 166, 240);
 }
 
 /* Tabela */
