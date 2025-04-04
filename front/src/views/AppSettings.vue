@@ -62,75 +62,99 @@ export default {
 </script>
 
 <style scoped>
-/* Estilização Geral */
+/* Container principal */
 .settings-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100px;
+  padding: 2rem;
   background-color: #f4f4f4;
   min-height: 100vh;
 }
 
 .settings-content {
-  width: 90%;
-  max-width: 400px;
+  width: 100%;
+  max-width: 500px;
   background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Títulos */
+h1 {
+  color: #333;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  color: #444;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Seções */
 .settings-section {
-  margin: 20px 0;
+  margin-bottom: 2rem;
 }
 
-h1 {
-  color: #333;
-  text-align: center;
-}
-
-h3 {
-  margin-bottom: 10px;
-  color: #555;
-}
-
+/* Labels e Inputs */
 label {
   display: block;
-  margin-top: 10px;
+  margin: 12px 0 4px;
+  font-weight: 500;
+  color: #333;
 }
 
-input {
+input[type="text"],
+input[type="email"],
+input[type="password"] {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-top: 5px;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border 0.3s;
 }
 
+input:focus {
+  outline: none;
+  border-color: #5c6bc0;
+}
+
+/* Botão de salvar */
 button {
   width: 100%;
   padding: 12px;
   background-color: #5c6bc0;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
   color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 20px;
+  transition: background-color 0.3s;
 }
 
 button:hover {
   background-color: #3f4e8c;
 }
 
-/* Switch do Modo Escuro */
+/* Switch de Modo Escuro */
 .switch {
   position: relative;
   display: inline-block;
   width: 50px;
-  height: 24px;
+  height: 26px;
+  margin-top: 10px;
 }
 
 .switch input {
@@ -148,15 +172,15 @@ button:hover {
   bottom: 0;
   background-color: #ccc;
   transition: 0.4s;
-  border-radius: 24px;
+  border-radius: 34px;
 }
 
 .slider::before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
-  left: 4px;
+  height: 20px;
+  width: 20px;
+  left: 3px;
   bottom: 3px;
   background-color: white;
   transition: 0.4s;
@@ -164,31 +188,60 @@ button:hover {
 }
 
 input:checked + .slider {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 input:checked + .slider::before {
-  transform: translateX(26px);
+  transform: translateX(24px);
 }
 
-/* Modo Escuro */
+/* Modo escuro */
 .dark {
-  background-color: #222;
+  background-color: #1e1e1e;
   color: white;
 }
 
 .dark .settings-content {
-  background: #333;
+  background-color: #2a2a2a;
 }
 
 .dark h1,
-.dark h3 {
+.dark h3,
+.dark label {
   color: white;
 }
 
 .dark input {
-  background: #555;
+  background-color: #444;
   color: white;
-  border: 1px solid #777;
+  border: 1px solid #666;
+}
+
+.dark input::placeholder {
+  color: #ccc;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .settings-container {
+    padding: 1rem;
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  input {
+    font-size: 15px;
+  }
+
+  button {
+    font-size: 15px;
+    padding: 10px;
+  }
 }
 </style>

@@ -1,262 +1,128 @@
 <template>
-  <div class="overview-container">
+  <div class="p-4 sm:p-6 max-w-5xl mx-auto text-gray-800 dark:text-gray-100">
     <!-- Resumo Financeiro -->
-    <div class="summary-section">
-      <div class="summary-card">
-        <p>Receita Mensal</p>
-        <h3 class="income">R$ 0,00</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
+      <div class="card border-l-4 border-green-500 hover:shadow-xl dark:bg-gray-800">
+        <p class="text-sm uppercase text-gray-500 dark:text-gray-400">Receita Mensal</p>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-green-500 animate-pulse">R$ {{ receitaMensal.toFixed(2) }}</h3>
       </div>
-      <div class="summary-card">
-        <p>Despesa Mensal</p>
-        <h3 class="expense">R$ 0,00</h3>
+      <div class="card border-l-4 border-red-500 hover:shadow-xl dark:bg-gray-800">
+        <p class="text-sm uppercase text-gray-500 dark:text-gray-400">Despesa Mensal</p>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-red-500 animate-pulse">R$ {{ despesaMensal.toFixed(2) }}</h3>
       </div>
     </div>
 
     <!-- Acesso Rápido -->
-    <div class="quick-access">
-      <button class="expense-btn">➖ Despesa</button>
-      <button class="income-btn">➕ Receita</button>
-      <button class="transfer-btn">🔁 Transf.</button>
-      <button class="import-btn">🔗 Importar</button>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <QuickButton icon="arrow-down-circle" label="Despesa" color="red" />
+      <QuickButton icon="arrow-up-circle" label="Receita" color="green" />
+      <QuickButton icon="repeat" label="Transf." color="blue" />
+      <QuickButton icon="file-down" label="Importar" color="purple" />
     </div>
 
-    <!-- Saldo e Contas -->
-    <div class="accounts-section">
-      <div class="account-balance">
-        <h3>Saldo Geral</h3>
-        <p>R$ 0,00 👁</p>
-      </div>
-      <div class="account-list">
-        <h4>Minhas Contas</h4>
-        <div class="account-item">
+    <!-- Gráfico -->
+    <div class="card mb-8 dark:bg-gray-800 text-center">
+      <h3 class="text-lg font-semibold mb-4">Resumo Gráfico</h3>
+      <canvas ref="chartCanvas" class="w-40 h-40 sm:w-[180px] sm:h-[180px] mx-auto"></canvas>
+    </div>
+
+    <!-- Contas e Saldo -->
+    <div class="card mb-8 dark:bg-gray-800 hover:shadow-xl">
+      <h3 class="text-lg font-semibold mb-1">Saldo Geral</h3>
+      <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">R$ {{ saldoGeral.toFixed(2) }}</p>
+
+      <div class="mt-6">
+        <h4 class="text-md text-gray-600 dark:text-gray-300 mb-2">Minhas Contas</h4>
+        <div class="flex flex-col sm:flex-row justify-between gap-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md shadow-inner">
           <span>💳 Conta Inicial</span>
-          <p>R$ 0,00</p>
+          <p class="font-semibold">R$ {{ contaInicial.toFixed(2) }}</p>
         </div>
-        <button class="manage-btn">Gerenciar Contas</button>
+        <button class="mt-4 w-full py-2 px-4 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold shadow transition">
+          Gerenciar Contas
+        </button>
       </div>
     </div>
 
-    <!-- Contas a pagar e receber -->
-    <div class="bills-section">
-      <div class="bill-card">
-        <h4>Contas a Pagar</h4>
-        <p>No momento você não possui contas a pagar</p>
+    <!-- Contas a Pagar e Receber -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+      <div class="card text-center hover:shadow-xl dark:bg-gray-800">
+        <h4 class="font-semibold text-lg mb-1">Contas a Pagar</h4>
+        <p class="text-gray-500 dark:text-gray-400">Nenhuma conta a pagar</p>
       </div>
-      <div class="bill-card">
-        <h4>Contas a Receber</h4>
-        <p>Você não possui contas a receber pendentes</p>
-      </div>
-    </div>
-
-    <!-- Blog e Notícias -->
-    <div class="blog-section">
-      <h3>Conteúdos do Blog</h3>
-      <div class="blog-post">
-        <h4>O que é open finance? Tudo o que você precisa saber!</h4>
-        <p>01/04/2025</p>
-      </div>
-      <div class="blog-post">
-        <h4>Qual o melhor banco para antecipar FGTS? Tire suas dúvidas!</h4>
-        <p>28/03/2025</p>
-      </div>
-      <div class="blog-post">
-        <h4>Como cortar gastos supérfluos sem perder qualidade de vida? Veja dicas!</h4>
-        <p>26/03/2025</p>
-      </div>
-      <button class="blog-btn">Ir para o Blog</button>
-    </div>
-
-    <!-- Faturas e Cartões -->
-    <div class="cards-section">
-      <div class="invoice-card">
-        <h4>Todas as Faturas</h4>
-        <p>R$ 0,00 👁</p>
-      </div>
-      <div class="cards-list">
-        <h4>Meus Cartões</h4>
-        <p>Adicione seu primeiro cartão</p>
-        <button class="manage-btn">Gerenciar Cartões</button>
-      </div>
-    </div>
-
-    <!-- Maiores Gastos e Limite -->
-    <div class="spending-section">
-      <div class="spending-card">
-        <h4>Maiores Gastos do Mês Atual</h4>
-        <p>Sem gastos no período</p>
-      </div>
-      <div class="spending-card">
-        <h4>Limite de Gastos de Abril</h4>
-        <p>Nenhum Limite de Gasto definido para o período</p>
+      <div class="card text-center hover:shadow-xl dark:bg-gray-800">
+        <h4 class="font-semibold text-lg mb-1">Contas a Receber</h4>
+        <p class="text-gray-500 dark:text-gray-400">Nenhuma conta pendente</p>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
+import { ArrowDownCircle, ArrowUpCircle, Repeat, FileDown } from 'lucide-vue';
+import Chart from 'chart.js/auto';
+
 export default {
-  name: "AppOverview",
-};
+  components: {
+    QuickButton: {
+      props: ['icon', 'label', 'color'],
+      components: { ArrowDownCircle, ArrowUpCircle, Repeat, FileDown },
+      computed: {
+        IconComponent() {
+          return {
+            'arrow-down-circle': ArrowDownCircle,
+            'arrow-up-circle': ArrowUpCircle,
+            repeat: Repeat,
+            'file-down': FileDown
+          }[this.icon];
+        }
+      },
+      template: `
+        <button :class="'flex flex-col items-center justify-center gap-2 p-4 rounded-xl text-white font-semibold bg-' + color + '-500 hover:bg-' + color + '-600 shadow-lg transition'">
+          <component :is="IconComponent" class="w-6 h-6 animate-bounce" />
+          {{ label }}
+        </button>
+      `
+    }
+  },
+  data() {
+    return {
+      receitaMensal: 2500.00,
+      despesaMensal: 1800.00,
+      saldoGeral: 700.00,
+      contaInicial: 1000.00,
+    };
+  },
+  mounted() {
+  const ctx = this.$refs.chartCanvas.getContext('2d');
+  const isDark = document.documentElement.classList.contains('dark');
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Receitas', 'Despesas'],
+      datasets: [{
+        data: [this.receitaMensal, this.despesaMensal],
+        backgroundColor: ['#22c55e', '#ef4444']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: {
+            color: isDark ? '#fff' : '#000'
+          }
+        }
+      }
+    }
+  });
+}
+}
 </script>
 
 <style scoped>
-/* Estilos gerais */
-.overview-container {
-  padding: 100px;
-  max-width: 900px;
-  margin: auto;
-}
-
-/* Resumo financeiro */
-.summary-section {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.summary-card {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  text-align: center;
-}
-
-.income {
-  color: green;
-}
-
-.expense {
-  color: red;
-}
-
-/* Acesso rápido */
-.quick-access {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-button {
-  flex: 1;
-  margin: 5px;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.expense-btn {
-  background: #ff4d4d;
-  color: white;
-}
-
-.income-btn {
-  background: #4caf50;
-  color: white;
-}
-
-.transfer-btn {
-  background: #2196f3;
-  color: white;
-}
-
-.import-btn {
-  background: #673ab7;
-  color: white;
-}
-
-/* Contas */
-.accounts-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.account-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background: #f5f5f5;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-.manage-btn {
-  background: #ff9800;
-  color: white;
-  margin-top: 10px;
-}
-
-/* Contas a pagar e receber */
-.bills-section {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.bill-card {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  text-align: center;
-}
-
-/* Blog */
-.blog-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.blog-post {
-  margin-bottom: 10px;
-}
-
-.blog-btn {
-  background: #008cba;
-  color: white;
-}
-
-/* Cartões e Faturas */
-.cards-section {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.invoice-card,
-.cards-list {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  text-align: center;
-}
-
-/* Maiores Gastos */
-.spending-section {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.spending-card {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  text-align: center;
+.card {
+  @apply p-6 bg-white rounded-xl shadow-md transition;
 }
 </style>
-
