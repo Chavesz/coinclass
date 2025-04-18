@@ -7,11 +7,11 @@
         <h1>CoinClass</h1>
       </div>
       <nav class="nav-menu">
-      <router-link to="/">🏠 Visão Geral</router-link>
-      <router-link to="/Appdashboard">📊 Dashboard</router-link>
-      <router-link to="/AppCategories">🏷️ Categorias</router-link>
-      <router-link to="/Apptransactions">💰 Transações</router-link>
-      <router-link to="/Appsettings">⚙️ Configurações</router-link>
+        <router-link to="/">🏠 Visão Geral</router-link>
+        <router-link to="/Appdashboard">📊 Dashboard</router-link>
+        <router-link to="/AppCategories">🏷️ Categorias</router-link>
+        <router-link to="/Apptransactions">💰 Transações</router-link>
+        <router-link to="/Appsettings">⚙️ Configurações</router-link>
       </nav>
     </header>
   </div>
@@ -84,5 +84,3 @@ h1 {
   color: black;
 }
 </style>
-
-
