@@ -3,13 +3,50 @@
     <AppNavbar />
 
     <div class="transactions-content">
-      <h1>Transações</h1>
-      <p>Listagem de receitas e despesas, com filtros.</p>
+      <div class="page-header">
+        <div class="header-content">
+          <h1>Transações</h1>
+          <p>Gerencie suas receitas e despesas</p>
+        </div>
+        <button class="add-transaction-btn" @click="openAddTransactionModal">
+          <i class="fas fa-plus"></i>
+          Nova Transação
+        </button>
+      </div>
 
-      <div class="filters">
-        <button @click="filterType = 'all'" :class="{ active: filterType === 'all' }">Todas</button>
-        <button @click="filterType = 'income'" :class="{ active: filterType === 'income' }">Receitas</button>
-        <button @click="filterType = 'expense'" :class="{ active: filterType === 'expense' }">Despesas</button>
+      <div class="filters-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Buscar transações..."
+          />
+        </div>
+
+        <div class="filters">
+          <button 
+            @click="filterType = 'all'" 
+            :class="{ active: filterType === 'all' }"
+          >
+            <i class="fas fa-list"></i>
+            Todas
+          </button>
+          <button 
+            @click="filterType = 'income'" 
+            :class="{ active: filterType === 'income' }"
+          >
+            <i class="fas fa-arrow-up"></i>
+            Receitas
+          </button>
+          <button 
+            @click="filterType = 'expense'" 
+            :class="{ active: filterType === 'expense' }"
+          >
+            <i class="fas fa-arrow-down"></i>
+            Despesas
+          </button>
+        </div>
       </div>
 
       <div class="transactions-table-wrapper">
@@ -21,43 +58,96 @@
                 <th>Descrição</th>
                 <th>Valor</th>
                 <th>Tipo</th>
-                <th>Ações</th> </tr>
+                <th>Ações</th>
+              </tr>
             </thead>
             <tbody>
               <tr v-for="transaction in filteredTransactions" :key="transaction.id">
-                <td>{{ transaction.date }}</td>
+                <td>{{ formatDate(transaction.date) }}</td>
                 <td>{{ transaction.description }}</td>
-                <td :class="transaction.type">{{ formatCurrency(transaction.amount) }}</td>
-                <td>{{ transaction.type === 'income' ? 'Receita' : 'Despesa' }}</td>
+                <td :class="transaction.type">
+                  {{ formatCurrency(transaction.amount) }}
+                </td>
                 <td>
-                  </td>
+                  <span :class="['type-badge', transaction.type]">
+                    {{ transaction.type === 'income' ? 'Receita' : 'Despesa' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="action-btn edit" @click="editTransaction(transaction)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" @click="deleteTransaction(transaction)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
-      <button class="add-transaction" @click="openAddTransactionModal">+ Adicionar Transação</button>
     </div>
 
-    <div v-if="showAddTransactionModal" class="modal-overlay">
+    <!-- Modal de Adicionar/Editar Transação -->
+    <div v-if="showAddTransactionModal" class="modal-overlay" @click.self="closeAddTransactionModal">
       <div class="modal-content">
-        <h2>Adicionar Nova Transação</h2>
-        <form @submit.prevent="saveNewTransaction">
+        <div class="modal-header">
+          <h2>{{ isEditing ? 'Editar Transação' : 'Nova Transação' }}</h2>
+          <button class="close-modal" @click="closeAddTransactionModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <form @submit.prevent="saveTransaction" class="transaction-form">
           <div class="form-group">
-            <label for="new-date">Data:</label>
-            <input type="date" id="new-date" v-model="newTransaction.date" required>
+            <label for="new-date">
+              <i class="fas fa-calendar"></i>
+              Data
+            </label>
+            <input 
+              type="date" 
+              id="new-date" 
+              v-model="newTransaction.date" 
+              required
+            >
           </div>
+
           <div class="form-group">
-            <label for="new-description">Descrição:</label>
-            <input type="text" id="new-description" v-model="newTransaction.description" required>
+            <label for="new-description">
+              <i class="fas fa-align-left"></i>
+              Descrição
+            </label>
+            <input 
+              type="text" 
+              id="new-description" 
+              v-model="newTransaction.description" 
+              placeholder="Digite a descrição"
+              required
+            >
           </div>
+
           <div class="form-group">
-            <label for="new-amount">Valor:</label>
-            <input type="number" id="new-amount" v-model.number="newTransaction.amount" required>
+            <label for="new-amount">
+              <i class="fas fa-dollar-sign"></i>
+              Valor
+            </label>
+            <input 
+              type="number" 
+              id="new-amount" 
+              v-model.number="newTransaction.amount" 
+              step="0.01"
+              placeholder="0,00"
+              required
+            >
           </div>
+
           <div class="form-group">
-            <label for="new-type">Tipo:</label>
+            <label for="new-type">
+              <i class="fas fa-tag"></i>
+              Tipo
+            </label>
             <select id="new-type" v-model="newTransaction.type" required>
               <option value="income">Receita</option>
               <option value="expense">Despesa</option>
@@ -65,47 +155,66 @@
           </div>
 
           <div class="modal-actions">
-            <button type="button" @click="closeAddTransactionModal" class="cancel-button">Cancelar</button>
-            <button type="submit" class="save-button">Salvar Transação</button>
+            <button type="button" @click="closeAddTransactionModal" class="cancel-button">
+              Cancelar
+            </button>
+            <button type="submit" class="save-button">
+              {{ isEditing ? 'Salvar Alterações' : 'Adicionar Transação' }}
+            </button>
           </div>
         </form>
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
 import AppNavbar from "@/components/AppNavbar.vue";
-// import Snackbar from "@/components/Snackbar.vue"; // Importe seu componente Snackbar se ele existir
 
 export default {
   components: {
     AppNavbar,
-    // Snackbar // Registre o Snackbar aqui se ele existir
   },
   data() {
     return {
       filterType: "all",
+      searchQuery: "",
       transactions: [
-        { id: 1, date: "2025-04-01", description: "Salário", amount: 3000, type: "income" }, // Formato YYYY-MM-DD para input date
+        { id: 1, date: "2025-04-01", description: "Salário", amount: 3000, type: "income" },
         { id: 2, date: "2025-04-02", description: "Aluguel", amount: -1200, type: "expense" },
         { id: 3, date: "2025-04-03", description: "Supermercado", amount: -400, type: "expense" },
         { id: 4, date: "2025-04-04", description: "Venda de Produto", amount: 600, type: "income" }
       ],
-      showAddTransactionModal: false, // Controla a visibilidade do modal
-      newTransaction: { // Objeto para a nova transação
+      showAddTransactionModal: false,
+      isEditing: false,
+      newTransaction: {
         id: null,
         date: '',
         description: '',
         amount: 0,
-        type: 'income' // Valor padrão
+        type: 'income'
       }
     };
   },
   computed: {
     filteredTransactions() {
-      if (this.filterType === "all") return this.transactions;
-      return this.transactions.filter(t => t.type === this.filterType);
+      let filtered = this.transactions;
+      
+      // Aplicar filtro de tipo
+      if (this.filterType !== "all") {
+        filtered = filtered.filter(t => t.type === this.filterType);
+      }
+      
+      // Aplicar busca
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(t => 
+          t.description.toLowerCase().includes(query) ||
+          this.formatCurrency(t.amount).includes(query)
+        );
+      }
+      
+      return filtered;
     }
   },
   methods: {
@@ -115,359 +224,456 @@ export default {
         currency: "BRL"
       }).format(value);
     },
-    // Método para abrir o modal
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('pt-BR');
+    },
     openAddTransactionModal() {
+      this.isEditing = false;
       this.showAddTransactionModal = true;
-      // Resetar o formulário para uma nova transação
       this.newTransaction = {
-        id: null, // O ID será gerado ao salvar
-        date: new Date().toISOString().slice(0, 10), // Define a data atual como padrão (formato YYYY-MM-DD)
+        id: null,
+        date: new Date().toISOString().slice(0, 10),
         description: '',
         amount: 0,
         type: 'income'
       };
     },
-    // Método para fechar o modal
+    editTransaction(transaction) {
+      this.isEditing = true;
+      this.showAddTransactionModal = true;
+      this.newTransaction = { ...transaction };
+    },
+    deleteTransaction(transaction) {
+      if (confirm('Tem certeza que deseja excluir esta transação?')) {
+        this.transactions = this.transactions.filter(t => t.id !== transaction.id);
+      }
+    },
     closeAddTransactionModal() {
       this.showAddTransactionModal = false;
+      this.isEditing = false;
     },
-    // Método para salvar a nova transação
-    saveNewTransaction() {
-      // Gerar um ID simples (em um app real, o backend faria isso ou usaria um UUID)
-      const newId = Math.max(...this.transactions.map(t => t.id)) + 1;
-      
-      // Criar o objeto da transação
+    saveTransaction() {
       let finalAmount = this.newTransaction.amount;
       if (this.newTransaction.type === 'expense' && finalAmount > 0) {
-        finalAmount *= -1; // Garante que despesas sejam negativas
+        finalAmount *= -1;
       } else if (this.newTransaction.type === 'income' && finalAmount < 0) {
-          finalAmount *= -1; // Garante que receitas sejam positivas
+        finalAmount *= -1;
       }
 
-      const transactionToAdd = {
-        id: newId,
-        date: this.newTransaction.date,
-        description: this.newTransaction.description,
-        amount: finalAmount,
-        type: this.newTransaction.type
+      const transactionToSave = {
+        ...this.newTransaction,
+        amount: finalAmount
       };
 
-      // Adicionar a nova transação à lista
-      this.transactions.push(transactionToAdd);
+      if (this.isEditing) {
+        const index = this.transactions.findIndex(t => t.id === this.newTransaction.id);
+        if (index !== -1) {
+          this.transactions[index] = transactionToSave;
+        }
+      } else {
+        const newId = Math.max(...this.transactions.map(t => t.id)) + 1;
+        transactionToSave.id = newId;
+        this.transactions.push(transactionToSave);
+      }
 
-      // Fechar o modal
       this.closeAddTransactionModal();
-
-      // Opcional: Exibir um Snackbar de sucesso
-      // if (this.$refs.chamaSnackbar) {
-      //   this.$refs.chamaSnackbar.snack("green", "Transação adicionada com sucesso!", "SUCESSO");
-      // }
     }
   }
 };
 </script>
 
 <style scoped>
-/* Estilos existentes */
+:root {
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --background-color: #f9fafb;
+  --card-background: #ffffff;
+  --border-color: #e5e7eb;
+  --error-color: #ef4444;
+  --success-color: #22c55e;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
 .transactions-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  background: #f8fafc;
+  min-height: 100vh;
+  padding-bottom: 2rem;
 }
 
 .transactions-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #4f46e5;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+.add-transaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-transaction-btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.filters-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+
+.search-box input {
   width: 100%;
-  max-width: 900px;
-  background-color: #f9f9f9;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #fff;
+  color: #1e293b;
+  transition: border 0.2s;
 }
 
-h1 {
-  color: #333;
-  margin-bottom: 10px;
+.search-box input:focus {
+  border-color: #4f46e5;
+  outline: none;
 }
 
-p {
-  color: #666;
-  margin-bottom: 20px;
+.filters {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .filters button {
-  background-color: #e0e0e0;
+  padding: 0.5rem 1.2rem;
+  border-radius: 0.5rem;
   border: none;
-  padding: 10px 15px;
-  margin-right: 10px;
-  border-radius: 5px;
+  background: #f3f4f6;
+  color: #4f46e5;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s, color 0.2s;
+}
+
+.filters button:hover {
+  background: #4f46e5;
+  color: #fff;
 }
 
 .filters button.active {
-  background-color: #007bff;
-  color: white;
+  background: #4f46e5;
+  color: #fff;
 }
 
 .transactions-table-wrapper {
-  overflow-x: auto;
-  margin-top: 20px;
+  background-color: var(--card-background);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
 }
 
-.transactions-table table {
+.transactions-table {
   width: 100%;
-  border-collapse: collapse;
-}
-
-.transactions-table th,
-.transactions-table td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+  border-collapse: separate;
+  border-spacing: 0 1rem;
+  background: none;
 }
 
 .transactions-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-  color: #333;
-}
-
-.transactions-table tbody tr:hover {
-  background-color: #f5f5f5;
-}
-
-/* Estilos para Receita e Despesa */
-.income {
-  color: green;
-  font-weight: bold;
-}
-
-.expense {
-  color: red;
-  font-weight: bold;
-}
-
-.add-transaction {
-  background-color: #28a745;
-  color: white;
+  background: none;
+  color: #4f46e5;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   border: none;
-  padding: 12px 20px;
-  border-radius: 5px;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.transactions-table td {
+  background: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(79,70,229,0.06);
+  color: #1e293b;
+  padding: 1.25rem 1.5rem;
+  font-size: 1rem;
+}
+
+.transactions-table tr.income td {
+  background: linear-gradient(90deg, #bbf7d0 0%, #f0fdf4 100%);
+  color: #065f46;
+}
+.transactions-table tr.expense td {
+  background: linear-gradient(90deg, #fecaca 0%, #fef2f2 100%);
+  color: #991b1b;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.4em 1em;
+  border-radius: 1em;
+  font-size: 0.95em;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #4f46e5;
+}
+.badge.income {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge.expense {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.action-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  margin: 0 0.1rem;
   cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s;
+  color: #4f46e5;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.action-btn.edit {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+.action-btn.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.action-btn:hover {
+  background: #c7d2fe;
 }
 
-.add-transaction:hover {
-  background-color: #218838;
-}
-
-/* START ESTILOS DO MODAL */
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 41, 59, 0.25);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000; /* Garante que o modal fique por cima de tudo */
+  justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 500px;
-  position: relative; /* Para posicionar o botão de fechar, se houver */
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px 0 rgba(31,41,55,0.18);
+  padding: 2rem 2.5rem;
+  max-width: 420px;
+  width: 100%;
+  animation: modalFadeIn 0.3s ease;
 }
 
-.modal-content h2 {
-  margin-top: 0;
-  color: #333;
-  margin-bottom: 20px;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.3rem;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+  padding: 0.5rem;
+}
+
+.close-modal:hover {
+  background: #f3f4f6;
+  color: #1e293b;
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #4f46e5;
+  font-weight: 600;
 }
 
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group input[type="date"],
+.form-group label i {
+  color: #64748b;
+}
+
+.form-group input,
 .form-group select {
-  width: calc(100% - 20px); /* Ajuste para padding */
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 0.7rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  color: #1e293b;
+  transition: border 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4f46e5;
+  outline: none;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 25px;
-  gap: 10px; /* Espaço entre os botões */
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-.modal-actions button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+.cancel-button,
+.save-button {
+  padding: 0.7rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  border: none;
+  transition: background 0.2s, color 0.2s;
 }
 
 .cancel-button {
-  background-color: #dc3545; /* Vermelho para cancelar */
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #c82333;
+  background: #f3f4f6;
+  color: #4f46e5;
 }
 
 .save-button {
-  background-color: #007bff; /* Azul para salvar */
-  color: white;
+  background: #4f46e5;
+  color: #fff;
+}
+
+.cancel-button:hover {
+  background: #e0e7ff;
 }
 
 .save-button:hover {
-  background-color: #0056b3;
-}
-/* END ESTILOS DO MODAL */
-
-.transactions-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  background-color: #f9fafb;
-  min-height: 100vh;
+  background: #4338ca;
 }
 
-.transactions-content {
-  width: 100%;
-  max-width: 1200px;
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-h1 {
-  color: #333;
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-p {
-  color: #555;
-  margin-bottom: 1.5rem;
-}
-
-/* Filtros */
-.filters {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
-
-.filters button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  background-color: #ddd;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.filters .active {
-  background-color: #5c6bc0;
-  color: white;
-}
-
-/* Tabela com rolagem */
-.transactions-table-wrapper {
-  overflow-x: auto;
-}
-
-.transactions-table {
-  background: white;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  min-width: 600px;
-}
-
-.transactions-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transactions-table th,
-.transactions-table td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-  font-size: 15px;
-}
-
-.transactions-table th {
-  background-color: #f0f0f0;
-  font-weight: 600;
-}
-
-.transactions-table .income {
-  color: green;
-}
-
-.transactions-table .expense {
-  color: red;
-}
-
-/* Botão de Adicionar */
-.add-transaction {
-  margin-top: 1.5rem;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 6px;
-  background-color: #5c6bc0;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.add-transaction:hover {
-  background-color: #3f4e8c;
-}
-
-/* Responsivo */
+/* Responsividade */
 @media (max-width: 768px) {
-  h1 {
-    font-size: 1.6rem;
+  .transactions-content {
+    padding: 1rem;
   }
 
-  .transactions-table {
-    min-width: 100%;
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+
+  .filters {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
   }
 
   .filters button {
-    flex: 1 1 auto;
+    white-space: nowrap;
+  }
+
+  .transactions-table th,
+  .transactions-table td {
+    padding: 0.75rem;
+  }
+
+  .modal-content {
+    margin: 1rem;
   }
 }
 </style>

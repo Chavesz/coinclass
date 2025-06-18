@@ -4,6 +4,7 @@ import router from './router';
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import './tailwind.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 Vue.config.productionTip = false;
 
