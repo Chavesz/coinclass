@@ -1,106 +1,76 @@
 <template>
-  <div class="chart-container">
-    <canvas ref="chartCanvas"></canvas>
+  <div class="chart-box" :style="{ height: height + 'px' }">
+    <canvas ref="canvas"></canvas>
   </div>
 </template>
 
 <script>
-import { Chart, registerables } from "chart.js";
+import Chart from 'chart.js/auto'
+import { state } from '@/store'
 
 export default {
-  name: "AppChart",
+  name: 'AppChart',
   props: {
-    chartData: Object,
+    type: { type: String, default: 'bar' },
+    data: { type: Object, required: true },
+    height: { type: Number, default: 280 },
+    money: { type: Boolean, default: true }
+  },
+  computed: { theme: () => state.theme },
+  watch: {
+    data: { deep: true, handler() { this.render() } },
+    theme() { this.$nextTick(this.render) }
   },
   mounted() {
-    Chart.register(...registerables);
-    this.renderChart();
+    this.render()
+    this.obs = new MutationObserver(() => this.render())
+    this.obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+  },
+  beforeDestroy() {
+    if (this.obs) this.obs.disconnect()
+    if (this.chart) this.chart.destroy()
   },
   methods: {
-    renderChart() {
-      new Chart(this.$refs.chartCanvas, {
-        type: "bar",
-        data: this.chartData || {
-          labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-          datasets: [
-            {
-              label: "Receitas",
-              data: [5000, 7000, 6000, 8000, 7500, 8200],
-              backgroundColor: "rgba(54, 162, 235, 0.6)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 2,
-            },
-            {
-              label: "Despesas",
-              data: [3000, 4500, 4000, 5000, 4800, 5100],
-              backgroundColor: "rgba(255, 99, 132, 0.6)",
-              borderColor: "rgba(255, 99, 132, 1)",
-              borderWidth: 2,
-            },
-          ],
-        },
+    render() {
+      if (this.chart) this.chart.destroy()
+      const css = getComputedStyle(document.documentElement)
+      const muted = css.getPropertyValue('--muted').trim()
+      const border = css.getPropertyValue('--border').trim()
+      const fmt = v => this.money
+        ? 'R$ ' + Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 0 })
+        : v
+      const isPie = this.type === 'doughnut'
+      this.chart = new Chart(this.$refs.canvas, {
+        type: this.type,
+        data: this.data,
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: { duration: 400 },
+          cutout: isPie ? '68%' : undefined,
           plugins: {
             legend: {
-              labels: {
-                font: {
-                  size: 14,
-                  weight: "bold",
-                },
-                color: "#333",
-              },
+              display: isPie ? false : this.data.datasets.length > 1,
+              position: 'bottom',
+              labels: { color: muted, usePointStyle: true, boxWidth: 8, font: { family: 'Plus Jakarta Sans', weight: 600 } }
             },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label || ctx.label}: ${fmt(isPie ? ctx.parsed : ctx.parsed.y)}`
+              }
+            }
           },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: function (value) {
-                  return `R$ ${value.toLocaleString("pt-BR")}`;
-                },
-                font: {
-                  size: 12,
-                },
-                color: "#666",
-              },
-              grid: {
-                color: "rgba(0, 0, 0, 0.1)",
-              },
-            },
-            x: {
-              ticks: {
-                font: {
-                  size: 12,
-                },
-                color: "#666",
-              },
-              grid: {
-                display: false,
-              },
-            },
-          },
-          animation: {
-            duration: 1000,
-            easing: "easeInOutQuad",
-          },
-        },
-      });
-    },
-  },
-};
+          scales: isPie ? {} : {
+            x: { grid: { display: false }, border: { display: false }, ticks: { color: muted } },
+            y: { grid: { color: border }, border: { display: false }, ticks: { color: muted, callback: fmt, maxTicksLimit: 5 } }
+          }
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
-.chart-container {
-  width: 100%;
-  max-width: 700px;
-  height: 400px;
-  margin: auto;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
+.chart-box { position: relative; width: 100%; }
 </style>

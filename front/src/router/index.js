@@ -1,57 +1,24 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import AppLogin from '@/views/AppLogin.vue'
-import AppRegister from '@/views/AppRegister.vue'
-import AppDashboard from '@/views/AppDashboard.vue'
+import AppOverview from '@/views/AppOverview.vue'
+import AppTransactions from '@/views/AppTransactions.vue'
 import AppCategories from '@/views/AppCategories.vue'
 import AppReports from '@/views/AppReports.vue'
 import AppSettings from '@/views/AppSettings.vue'
-import AppTransactions from '@/views/AppTransactions.vue'
-import AppOverview from '@/views/AppOverview.vue'
+import AppLogin from '@/views/AppLogin.vue'
 
 Vue.use(Router)
 
 export default new Router({
+  scrollBehavior: () => ({ x: 0, y: 0 }),
   routes: [
-    {
-      path: "/",
-      name: "Overview",
-      component: AppOverview
-    },
-    {
-      path: '/Applogin',
-      name: 'AppLogin',
-      component: AppLogin
-    },
-    {
-      path: '/Appregister',
-      name: 'AppRegister',
-      component: AppRegister
-    },
-    {
-      path: '/AppDashboard',
-      name: 'AppDashboard',
-      component: AppDashboard
-    },
-    {
-      path: '/AppCategories',
-      name: 'AppCategories',
-      component: AppCategories
-    },
-    {
-      path: '/AppReports',
-      name: 'AppReports',
-      component: AppReports
-    },
-    {
-      path: '/AppSettings',
-      name: 'AppSettings',
-      component: AppSettings
-    },
-    {
-      path: '/AppTransactions',
-      name: 'AppTransactions',
-      component: AppTransactions
-    },
+    { path: '/', name: 'overview', component: AppOverview, meta: { title: 'Visão geral' } },
+    { path: '/transacoes', name: 'transactions', component: AppTransactions, meta: { title: 'Transações' } },
+    { path: '/categorias', name: 'categories', component: AppCategories, meta: { title: 'Categorias' } },
+    { path: '/relatorios', name: 'reports', component: AppReports, meta: { title: 'Relatórios' } },
+    { path: '/configuracoes', name: 'settings', component: AppSettings, meta: { title: 'Configurações' } },
+    { path: '/entrar', name: 'login', component: AppLogin, meta: { bare: true, mode: 'login' } },
+    { path: '/cadastro', name: 'register', component: AppLogin, meta: { bare: true, mode: 'register' } },
+    { path: '*', redirect: '/' }
   ]
 })
