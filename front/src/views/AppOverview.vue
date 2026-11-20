@@ -1,133 +1,148 @@
 <template>
   <div>
-    <AppNavbar />
-    <div class="p-4 sm:p-6 max-w-5xl mx-auto text-gray-800 dark:text-gray-100">
-      <!-- Resumo Financeiro -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
-        <div class="card border-l-4 border-green-500 hover:shadow-xl dark:bg-gray-800">
-          <p class="text-sm uppercase text-gray-500 dark:text-gray-400">Receita Mensal</p>
-          <h3 class="text-2xl sm:text-3xl font-extrabold text-green-500 animate-pulse">R$ {{ receitaMensal.toFixed(2) }}</h3>
-        </div>
-        <div class="card border-l-4 border-red-500 hover:shadow-xl dark:bg-gray-800">
-          <p class="text-sm uppercase text-gray-500 dark:text-gray-400">Despesa Mensal</p>
-          <h3 class="text-2xl sm:text-3xl font-extrabold text-red-500 animate-pulse">R$ {{ despesaMensal.toFixed(2) }}</h3>
-        </div>
+    <div class="page-head">
+      <div>
+        <h1>Olá, {{ firstName }}</h1>
+        <p>Resumo de {{ monthLabel }}.</p>
       </div>
+    </div>
 
-      <!-- Acesso Rápido -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <QuickButton icon="arrow-down-circle" label="Despesa" color="red" />
-        <QuickButton icon="arrow-up-circle" label="Receita" color="green" />
-        <QuickButton icon="repeat" label="Transf." color="blue" />
-        <QuickButton icon="file-down" label="Importar" color="purple" />
+    <div class="grid grid-3 stats">
+      <div class="card stat balance">
+        <span class="stat-label"><i class="fa-solid fa-wallet"></i> Saldo do mês</span>
+        <strong class="num">{{ money(income - expense) }}</strong>
+        <small>Total acumulado: {{ money(totalBalance) }}</small>
       </div>
-
-      <!-- Gráfico -->
-      <div class="card mb-8 dark:bg-gray-800 text-center">
-        <h3 class="text-lg font-semibold mb-4">Resumo Gráfico</h3>
-        <canvas ref="chartCanvas" class="w-60 h-60 sm:w-[180px] sm:h-[180px] mx-auto"></canvas>
+      <div class="card stat">
+        <span class="stat-label"><span class="ico income"><i class="fa-solid fa-arrow-trend-up"></i></span> Receitas</span>
+        <strong class="num">{{ money(income) }}</strong>
+        <small class="muted">{{ countIncome }} lançamento(s)</small>
       </div>
-
-      <!-- Contas e Saldo -->
-      <div class="card mb-8 dark:bg-gray-800 hover:shadow-xl">
-        <h3 class="text-lg font-semibold mb-1">Saldo Geral</h3>
-        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">R$ {{ saldoGeral.toFixed(2) }}</p>
-
-        <div class="mt-6">
-          <h4 class="text-md text-gray-600 dark:text-gray-300 mb-2">Minhas Contas</h4>
-          <div class="flex flex-col sm:flex-row justify-between gap-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md shadow-inner">
-            <span>💳 Conta Inicial</span>
-            <p class="font-semibold">R$ {{ contaInicial.toFixed(2) }}</p>
-          </div>
-          <button class="mt-4 w-full py-2 px-4 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold shadow transition">
-            Gerenciar Contas
-          </button>
-        </div>
+      <div class="card stat">
+        <span class="stat-label"><span class="ico expense"><i class="fa-solid fa-arrow-trend-down"></i></span> Despesas</span>
+        <strong class="num">{{ money(expense) }}</strong>
+        <small class="muted">{{ countExpense }} lançamento(s)</small>
       </div>
+    </div>
 
-      <!-- Contas a Pagar e Receber -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <div class="card text-center hover:shadow-xl dark:bg-gray-800">
-          <h4 class="font-semibold text-lg mb-1">Contas a Pagar</h4>
-          <p class="text-gray-500 dark:text-gray-400">Nenhuma conta a pagar</p>
+    <div class="grid grid-2 row">
+      <div class="card">
+        <div class="card-title">Receitas x despesas <span class="pill">Últimos 6 meses</span></div>
+        <AppChart :data="barData" :height="270" />
+      </div>
+      <div class="card">
+        <div class="card-title">Gastos por categoria <router-link to="/relatorios">Ver relatório</router-link></div>
+        <div v-if="byCat.length" class="donut-wrap">
+          <AppChart type="doughnut" :data="donutData" :height="170" />
+          <ul class="legend">
+            <li v-for="c in byCat.slice(0, 5)" :key="c.id">
+              <span class="dot" :style="{ background: c.color }"></span>
+              <span class="lname">{{ c.name }}</span>
+              <span class="num">{{ pct(c.total) }}%</span>
+            </li>
+          </ul>
         </div>
-        <div class="card text-center hover:shadow-xl dark:bg-gray-800">
-          <h4 class="font-semibold text-lg mb-1">Contas a Receber</h4>
-          <p class="text-gray-500 dark:text-gray-400">Nenhuma conta pendente</p>
-        </div>
+        <div v-else class="empty"><i class="fa-solid fa-chart-pie"></i>Sem despesas neste mês.</div>
+      </div>
+    </div>
+
+    <div class="card row">
+      <div class="card-title">Últimas transações <router-link to="/transacoes">Ver todas</router-link></div>
+      <TxRow v-for="t in recent" :key="t.id" :tx="t" />
+      <div v-if="!recent.length" class="empty">
+        <i class="fa-solid fa-receipt"></i>Nenhuma transação ainda.
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
-import { ArrowDownCircle, ArrowUpCircle, Repeat, FileDown } from 'lucide-vue';
-import Chart from 'chart.js/auto';
-import AppNavbar from '@/components/AppNavbar.vue';
+import AppChart from '@/components/AppChart.vue'
+import TxRow from '@/components/TxRow.vue'
+import { state, money, MONTHS, monthKey } from '@/store'
 
 export default {
-  components: {
-    AppNavbar,
-    QuickButton: {
-      props: ['icon', 'label', 'color'],
-      components: { ArrowDownCircle, ArrowUpCircle, Repeat, FileDown },
-      computed: {
-        IconComponent() {
-          return {
-            'arrow-down-circle': ArrowDownCircle,
-            'arrow-up-circle': ArrowUpCircle,
-            repeat: Repeat,
-            'file-down': FileDown
-          }[this.icon];
-        }
-      },
-      template: `
-        <button :class="'flex flex-col items-center justify-center gap-2 p-4 rounded-xl text-white font-semibold bg-' + color + '-500 hover:bg-' + color + '-600 shadow-lg transition'">
-          <component :is="IconComponent" class="w-6 h-6 animate-bounce" />
-          {{ label }}
-        </button>
-      `
-    }
-  },
-  data() {
-    return {
-      receitaMensal: 2500.00,
-      despesaMensal: 1800.00,
-      saldoGeral: 700.00,
-      contaInicial: 1000.00,
-    };
-  },
-  mounted() {
-  const ctx = this.$refs.chartCanvas.getContext('2d');
-  const isDark = document.documentElement.classList.contains('dark');
-
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Receitas', 'Despesas'],
-      datasets: [{
-        data: [this.receitaMensal, this.despesaMensal],
-        backgroundColor: ['#22c55e', '#ef4444']
-      }]
+  components: { AppChart, TxRow },
+  data: () => ({ state }),
+  computed: {
+    firstName() { return (state.user.name || 'Visitante').split(' ')[0] },
+    key() {
+      const d = new Date()
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          labels: {
-            color: isDark ? '#fff' : '#000'
-          }
-        }
+    monthLabel() {
+      const d = new Date()
+      return d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+    },
+    monthTx() { return state.transactions.filter(t => monthKey(t.date) === this.key) },
+    income() { return this.sum(this.monthTx, 'income') },
+    expense() { return this.sum(this.monthTx, 'expense') },
+    countIncome() { return this.monthTx.filter(t => t.type === 'income').length },
+    countExpense() { return this.monthTx.filter(t => t.type === 'expense').length },
+    totalBalance() { return this.sum(state.transactions, 'income') - this.sum(state.transactions, 'expense') },
+    recent() {
+      return [...state.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6)
+    },
+    barData() {
+      const now = new Date()
+      const months = []
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        months.push({ key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, label: MONTHS[d.getMonth()] })
+      }
+      const by = (k, type) => this.sum(state.transactions.filter(t => monthKey(t.date) === k), type)
+      return {
+        labels: months.map(m => m.label),
+        datasets: [
+          { label: 'Receitas', data: months.map(m => by(m.key, 'income')), backgroundColor: '#10b981', borderRadius: 6, maxBarThickness: 22 },
+          { label: 'Despesas', data: months.map(m => by(m.key, 'expense')), backgroundColor: '#f43f5e', borderRadius: 6, maxBarThickness: 22 }
+        ]
+      }
+    },
+    byCat() {
+      const map = {}
+      this.monthTx.filter(t => t.type === 'expense').forEach(t => { map[t.categoryId] = (map[t.categoryId] || 0) + t.amount })
+      return state.categories.filter(c => map[c.id]).map(c => ({ ...c, total: map[c.id] })).sort((a, b) => b.total - a.total)
+    },
+    donutData() {
+      return {
+        labels: this.byCat.map(c => c.name),
+        datasets: [{ data: this.byCat.map(c => c.total), backgroundColor: this.byCat.map(c => c.color), borderWidth: 0 }]
       }
     }
-  });
-}
+  },
+  methods: {
+    money,
+    sum(list, type) { return list.filter(t => t.type === type).reduce((s, t) => s + Number(t.amount), 0) },
+    pct(v) { return this.expense ? Math.round((v / this.expense) * 100) : 0 }
+  }
 }
 </script>
 
 <style scoped>
-.card {
-  @apply p-6 bg-white rounded-xl shadow-md transition;
+.row { margin-top: 16px; }
+@media (max-width: 900px) {
+  .stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stats .balance { grid-column: 1 / -1; }
+  .stat { padding: 16px; }
+  .stat strong { font-size: clamp(1rem, 4.6vw, 1.25rem); }
+  .stats .balance strong { font-size: 1.9rem; }
 }
+.stat { display: flex; flex-direction: column; gap: 8px; }
+.stat-label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: .9rem; color: var(--muted); }
+.stat strong { font-size: 1.75rem; font-weight: 800; letter-spacing: -.02em; }
+.stat small { font-size: .8rem; }
+.ico { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: .8rem; }
+.ico.income { background: var(--income-soft); color: var(--income); }
+.ico.expense { background: var(--expense-soft); color: var(--expense); }
+.stat.balance { background: linear-gradient(135deg, #1f2433, #121826); color: #fff; border-color: transparent; }
+.stat.balance .stat-label, .stat.balance small { color: rgba(255,255,255,.7); }
+.stat.balance .stat-label i { color: var(--accent); }
+html.dark .stat.balance { background: linear-gradient(135deg, #2a2210, #1a1508); border-color: rgba(251,191,36,.25); }
+.donut-wrap { display: flex; flex-direction: column; gap: 16px; }
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.legend li { display: flex; align-items: center; gap: 10px; font-size: .9rem; }
+.legend .dot { width: 10px; height: 10px; border-radius: 3px; }
+.legend .lname { flex: 1; }
+.legend .num { font-weight: 700; }
 </style>

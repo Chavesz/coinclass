@@ -1,17 +1,16 @@
-import Vue from 'vue';
-import App from './App.vue';
-import router from './router';
-import Vuetify from 'vuetify';
-import 'vuetify/dist/vuetify.min.css';
-import './tailwind.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import Vue from 'vue'
+import App from './App.vue'
+import router from './router'
+import '@fortawesome/fontawesome-free/css/all.min.css'
+import './styles.css'
+import { applyTheme } from './store'
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = false
 
-Vue.use(Vuetify);  // Aqui você registra o Vuetify
+applyTheme()
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme)
 
 new Vue({
-  render: h => h(App),
   router,
-  vuetify: new Vuetify()  // Agora você passa uma instância do Vuetify para a Vue
-}).$mount('#app');
+  render: h => h(App)
+}).$mount('#app')
